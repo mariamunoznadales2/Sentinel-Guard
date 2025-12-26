@@ -1,0 +1,151 @@
+@startuml Diagrama de clases principal- modelo de dominio y servicios
+skinparam classAttributeIconSize 0
+
+' Enumeraciones
+enum PerfilUsuario {
+  hogar
+  empresa
+  mixto
+}
+
+enum EstadoAlarma {
+  Desarmado
+  RetardoSalida
+  Armado
+  RetardoEntrada
+  AlarmaDisparada
+}
+
+enum TipoSensor {
+  Movimiento
+  Puerta
+  Humo
+  RoturaCristal
+}
+
+enum EstadoSensor {
+  Inactivo
+  Activo
+  Disparado
+  Desconectado
+}
+
+enum TipoModo {
+  Predefinido
+  Usuario
+}
+
+' Clases de dominio
+class Usuario {
+  - id: int
+  - nombre: str
+  - email: str
+  - direccion: str
+  - idioma: str
+  - tema: str
+  - perfil: PerfilUsuario
+  + cambiarPreferencias()
+}
+
+abstract class Sensor {
+  - id: int
+  - nombre: str
+  - tipo: TipoSensor
+  - zona: str
+  - estado: EstadoSensor
+  + disparar()
+  + reset()
+}
+
+class SensorMovimiento
+class SensorPuerta
+class SensorHumo
+class SensorRoturaCristal
+
+Sensor <|-- SensorMovimiento
+Sensor <|-- SensorPuerta
+Sensor <|-- SensorHumo
+Sensor <|-- SensorRoturaCristal
+
+class ModoSeguridad {
+  - id: int
+  - nombre: str
+  - descripcion: str
+  - tipoModo: TipoModo
+  - perfilDestino: PerfilUsuario
+  - retardoEntrada: int
+  - retardoSalida: int
+  - sensibilidad: int
+  - sensoresActivos: List<Sensor>
+  + esValidoPara(perfil: PerfilUsuario): bool
+}
+
+class Alarma {
+  - estado: EstadoAlarma
+  - modoActivo: ModoSeguridad
+  - sensores: List<Sensor>
+  + armar(modo: ModoSeguridad)
+  + desarmar()
+  + procesarDisparo(sensor: Sensor)
+  + activarSirena()
+  + desactivarSirena()
+  + reiniciar()
+}
+
+' Servicios
+class GestorBD {
+  + inicializarEsquema()
+  + obtenerUsuario(email: str, password: str): Usuario
+  + obtenerModosPredefinidos(perfil: PerfilUsuario): List<ModoSeguridad>
+  + obtenerModosUsuario(usuario: Usuario): List<ModoSeguridad>
+  + guardarModoUsuario(modo: ModoSeguridad, usuario: Usuario)
+  + listarSensores(): List<Sensor>
+  + guardarEvento(...)
+}
+
+class GestorAlarma {
+  - alarma: Alarma
+  - bd: GestorBD
+  + armarConModo(usuario: Usuario, modoId: int)
+  + desarmar(usuario: Usuario)
+  + registrarEvento(...)
+}
+
+class SimuladorSensores {
+  - sensores: List<Sensor>
+  + iniciarSimulacion()
+  + detenerSimulacion()
+  + generarDisparoAleatorio()
+}
+
+' Clases frontera (UI)
+class UI_Inicio
+class UI_Modos
+class UI_Sensores
+class UI_Historial
+class UI_Perfil
+class UI_Configuracion
+
+' Relaciones
+Usuario "1" - "1" Alarma : "utiliza a través de\nla interfaz"
+Usuario "1" -- "0..*" ModoSeguridad : "crea/usa\n(modos usuario)"
+
+Alarma "1" o-- "0..*" Sensor
+Alarma "1" --> "1" ModoSeguridad
+
+GestorAlarma "1" --> "1" Alarma
+GestorAlarma "1" --> "1" GestorBD
+
+SimuladorSensores "1" --> "0..*" Sensor
+GestorBD "1" --> "0..*" Sensor
+GestorBD "1" --> "0..*" ModoSeguridad
+
+UI_Inicio --> GestorAlarma
+UI_Modos --> GestorAlarma
+UI_Sensores --> GestorAlarma
+UI_Sensores --> SimuladorSensores
+UI_Historial --> GestorBD
+UI_Perfil --> GestorBD
+UI_Configuracion --> GestorBD
+
+@enduml

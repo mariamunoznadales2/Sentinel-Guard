@@ -1,0 +1,30 @@
+@startuml Casos de Uso- visión global del sistema
+left to right direction
+
+actor "Usuario" as Usuario
+
+rectangle "Sistema SentinelGuard" {
+  usecase "Iniciar sesión" as UC_Login
+  usecase "Ver estado del sistema" as UC_Status
+  usecase "Armar sistema\ncon un modo" as UC_Arm
+  usecase "Desarmar sistema" as UC_Disarm
+  usecase "Activar SOS" as UC_SOS
+  usecase "Gestionar modos\n(crear/editar/eliminar)" as UC_Modes
+  usecase "Gestionar sensores\n(ver/simular disparo)" as UC_Sensors
+  usecase "Consultar historial\nde eventos" as UC_History
+  usecase "Editar perfil de usuario" as UC_Profile
+  usecase "Configurar sistema\n(reinicio de fábrica,\nparámetros avanzados)" as UC_Config
+}
+
+Usuario --> UC_Login
+Usuario --> UC_Status
+Usuario --> UC_Arm
+Usuario --> UC_Disarm
+Usuario --> UC_SOS
+Usuario --> UC_Modes
+Usuario --> UC_Sensors
+Usuario --> UC_History
+Usuario --> UC_Profile
+Usuario --> UC_Config
+
+@enduml

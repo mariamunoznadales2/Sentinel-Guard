@@ -1,0 +1,25 @@
+@startuml Clase Alarma
+[*] --> Desarmado
+
+Desarmado : estado por defecto
+Desarmado --> RetardoSalida : armar(modo)
+Desarmado --> Desarmado : error / usuario no autenticado
+
+RetardoSalida : cuenta atrás antes de armar
+RetardoSalida --> Armado : tiempoSalida expirado
+RetardoSalida --> Desarmado : desarmar()
+
+Armado : sistema vigilando
+Armado --> RetardoEntrada : sensorActivoDisparado
+Armado --> Desarmado : desarmar()
+
+RetardoEntrada : tiempo para desarmar antes de alarma
+RetardoEntrada --> AlarmaDisparada : tiempoEntrada expirado
+RetardoEntrada --> Desarmado : desarmar()
+
+AlarmaDisparada : sirena activa, evento registrado
+AlarmaDisparada --> Desarmado : desarmar() / reiniciar()
+
+Desarmado --> [*]
+
+@enduml

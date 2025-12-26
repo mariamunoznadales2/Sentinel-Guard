@@ -1,0 +1,36 @@
+@startuml Diagrama de secuencia: disparo de sensor con sistema armado
+actor Usuario
+participant UI_Sensores as UI
+participant Sensor
+participant Alarma
+participant GestorAlarma as GA
+participant GestorBD as BD
+
+== Sistema armado previamente ==
+Usuario -> UI : arma sistema con un modo
+UI -> GA : armarConModo(usuario, modoId)
+GA -> BD : obtenerModo(modoId)
+GA -> Alarma : armar(modo)
+Alarma --> Alarma : estado = RetardoSalida -> Armado
+
+== Disparo del sensor ==
+Sensor -> Alarma : disparar()
+Alarma --> Alarma : procesarDisparo(sensor)
+
+alt estado == Armado
+  Alarma -> Alarma : pasar a RetardoEntrada
+  Alarma -> UI : notificación visual\n"Sensor X disparado"
+  ... tiempo de retardo de entrada ...
+  Alarma --> Alarma : tiempoEntrada expira
+  Alarma -> Alarma : estado = AlarmaDisparada
+  Alarma -> GA : activarSirena()
+  GA -> Alarma : activarSirena()
+  GA -> BD : guardarEvento(\n tipo="Alarma", sensor, modoActivo )
+  GA -> UI : mostrar banner rojo\n"ALERTA: intrusión detectada"
+else estado == Desarmado
+  Alarma -> GA : registrarEventoPrueba()
+  GA -> BD : guardarEvento(\n tipo="Prueba / evento silencioso")
+  GA -> UI : notificación discreta
+end
+
+@enduml

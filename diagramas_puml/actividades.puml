@@ -1,0 +1,21 @@
+@startuml Diagrama de actividades: inicio de sesión y carga dinámica de modos por perfil
+start
+
+:Usuario introduce\ncredenciales en login;
+:UI envía credenciales\na GestorBD;
+if (Credenciales válidas?) then (sí)
+  :GestorBD obtiene\nUsuario y su perfil;
+  :UI almacena usuario\nen sesión;
+  :GestorBD consulta\nmodos_predefinidos\nfiltrando por perfilDestino;
+  :GestorBD consulta\nmodos_usuario\npara ese usuario;
+  :Construir objetos\nModoSeguridad;
+  :Inyectar lista de modos\nválidos en instancia Alarma;
+  :UI genera tarjetas de modos\nsolo con modos compatibles;
+  :Mostrar pantalla Inicio/Modos;
+else (no)
+  :Mostrar mensaje de error;
+  :Permanecer en pantalla de login;
+endif
+
+stop
+@enduml

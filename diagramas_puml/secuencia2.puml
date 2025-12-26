@@ -1,0 +1,22 @@
+@startuml Diagrama de secuencia: creación de un modo personalizado
+actor Usuario
+participant UI_Modos as UI
+participant GestorAlarma as GA
+participant GestorBD as BD
+
+Usuario -> UI : abrir "Crear nuevo modo"
+UI -> BD : listarSensores()
+BD --> UI : lista de sensores disponibles
+
+Usuario -> UI : introduce nombre,\nretardos, descripción,\nselecciona sensores, sensibilidad
+Usuario -> UI : pulsa "Guardar"
+
+UI -> GA : crearModoUsuario(datosFormulario)
+GA -> BD : guardarModoUsuario(modo, usuario)
+BD --> GA : modo guardado (id asignado)
+
+GA -> UI : confirmar éxito
+UI -> Usuario : banner verde\n"Modo guardado correctamente"
+UI -> UI : actualizar listado\nde modos (incluyendo modo nuevo)
+
+@enduml
